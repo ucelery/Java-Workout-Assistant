@@ -50,6 +50,10 @@ public class Exercise {
         return this.type;
     }
     
+    public float getBreakTime() {
+        return this.breakTime;
+    }
+    
     // Setters
     public void setName(String name) {
         this.name = name;

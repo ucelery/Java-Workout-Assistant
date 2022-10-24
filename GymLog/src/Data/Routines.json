@@ -1,0 +1,46 @@
+{
+    "Routines": [
+        {
+            "routine_name": "Monday Routine",
+            "exercises": [
+                {
+                    "exercise_name": "Jogging",
+                    "exercise_type": "time",
+                    "break_time": 300,
+                    "execution_time": 600,
+                    "reps": 0,
+                    "sets": 3
+                },
+                {
+                    "exercise_name": "Push-ups",
+                    "exercise_type": "reps",
+                    "break_time": 300,
+                    "execution_time": 0,
+                    "reps": 7,
+                    "sets": 3
+                }
+            ]
+        },
+        {
+            "routine_name": "Wednesday Routine",
+            "exercises": [
+                {
+                    "exercise_name": "Jogging",
+                    "exercise_type": "time",
+                    "break_time": 300,
+                    "execution_time": 600,
+                    "reps": 0,
+                    "sets": 3
+                },
+                {
+                    "exercise_name": "Push-ups",
+                    "exercise_type": "reps",
+                    "break_time": 300,
+                    "execution_time": 0,
+                    "reps": 7,
+                    "sets": 3
+                }
+            ]
+        }
+    ]
+}
