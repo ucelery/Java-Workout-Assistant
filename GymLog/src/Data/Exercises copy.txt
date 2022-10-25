@@ -1,4 +1,0 @@
-0,Jogging,time,300,600,0,3
-0,Push-ups,reps,300,0,7,3
-1,Jogging,time,300,600,0,3
-1,Sit-ups,reps,300,0,7,3
