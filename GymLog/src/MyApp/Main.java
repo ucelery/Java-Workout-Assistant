@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Stack;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -34,7 +35,7 @@ public class Main extends javax.swing.JFrame {
     CardLayout cardLayout;
     boolean menuToggle = false;
     
-    ArrayList<Routine> routineList = new ArrayList<>();
+    public ArrayList<Routine> routineList = new ArrayList<>();
     
     Exercise tempExer = null;
     Routine tempRoutine = null;
@@ -93,6 +94,7 @@ public class Main extends javax.swing.JFrame {
         routineMenu = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("GymLogger");
         setUndecorated(true);
 
         jPanel1.setBackground(new java.awt.Color(32, 32, 32));
@@ -586,6 +588,14 @@ public class Main extends javax.swing.JFrame {
             }
             
             routinePanelContainer.setPreferredSize(new Dimension(routinePanelContainer.getPreferredSize().width, yPos));
+            routinePanelContainer.repaint();
+    }
+    
+    public void removeRoutine(Routine routine, JPanel panelObj) {
+        routineList.remove(routine);
+        updateFiles();
+        updateRoutineScreen();
+        routinePanelContainer.remove(panelObj);   
     }
     
     private void addObjectButton(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addObjectButton
@@ -635,6 +645,7 @@ public class Main extends javax.swing.JFrame {
     private void addRoutineClick(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addRoutineClick
         switchScreens("addRoutineScreen");
         tempRoutine = new Routine(Integer.toString(routineList.size()));
+        exercisesCount.setText(Integer.toString(tempRoutine.getExercises().size()));
     }//GEN-LAST:event_addRoutineClick
 
     private void backButtonClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_backButtonClicked
@@ -713,6 +724,9 @@ public class Main extends javax.swing.JFrame {
                 FrameDragListener frameDragListener = new FrameDragListener(frame);
                 frame.addMouseListener(frameDragListener);
                 frame.addMouseMotionListener(frameDragListener);
+                
+                ImageIcon icon = new ImageIcon(System.getProperty("user.dir") + "\\src\\MyIcons\\Group 288915.png");
+                frame.setIconImage(icon.getImage());
             }
         });
     }
