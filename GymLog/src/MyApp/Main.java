@@ -5,7 +5,10 @@
 package MyApp;
 
 import MyLibs.*;
+import PremadeObject.RoutinePanelObject;
 import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
@@ -20,16 +23,23 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Stack;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 public class Main extends javax.swing.JFrame {
-    static JFrame frame = null;
+    public static JFrame frame = null;
     CardLayout cardLayout;
     boolean menuToggle = false;
     
-    ArrayList<Routine> routineList = new ArrayList<Routine>();
-    ArrayList<Exercise> tempExercises = new ArrayList<Exercise>();
+    ArrayList<Routine> routineList = new ArrayList<>();
+    
+    Exercise tempExer = null;
+    Routine tempRoutine = null;
+    
+    public Stack<String> history = new Stack();
     
     public Main() {
         initComponents();
@@ -37,6 +47,9 @@ public class Main extends javax.swing.JFrame {
         menuBar.setVisible(false);
         initializeHotkeys();
         populateRoutineList();
+        styleComponents();
+        
+        history.add("titleScreen");
     }
 
     @SuppressWarnings("unchecked")
@@ -46,32 +59,25 @@ public class Main extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         titleBar = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         mainScreen = new javax.swing.JPanel();
         titleScreen = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         routineScreen = new javax.swing.JPanel();
-        routineContainers = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
-        monRoutineBtn = new javax.swing.JLabel();
-        monInfoBtn = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
-        tuesRoutineBtn = new javax.swing.JLabel();
-        tueInfoBtn = new javax.swing.JLabel();
-        jPanel5 = new javax.swing.JPanel();
-        wedRoutineBtn = new javax.swing.JLabel();
-        wedInfoBtn = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        divider = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        routinePanelContainer = new javax.swing.JPanel();
         addRoutineScreen = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         routineNameTxt = new javax.swing.JTextField();
-        repsTxt = new javax.swing.JTextField();
         setsTxt = new javax.swing.JTextField();
         breakIntervalTxt = new javax.swing.JTextField();
         executionTimeTxt = new javax.swing.JTextField();
@@ -81,16 +87,10 @@ public class Main extends javax.swing.JFrame {
         jLabel15 = new javax.swing.JLabel();
         exercisesCount = new javax.swing.JLabel();
         activityScreen = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel17 = new javax.swing.JLabel();
-        jLabel18 = new javax.swing.JLabel();
-        exerciseNameLabel = new javax.swing.JLabel();
         menuBar = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         homeMenu = new javax.swing.JMenuItem();
         routineMenu = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -108,26 +108,39 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyIcons/back.png"))); // NOI18N
+        jLabel3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                backButtonClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout titleBarLayout = new javax.swing.GroupLayout(titleBar);
         titleBar.setLayout(titleBarLayout);
         titleBarLayout.setHorizontalGroup(
             titleBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, titleBarLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel4)
-                .addGap(17, 17, 17))
+                .addGap(18, 18, 18))
         );
         titleBarLayout.setVerticalGroup(
             titleBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, titleBarLayout.createSequentialGroup()
                 .addGap(0, 17, Short.MAX_VALUE)
-                .addComponent(jLabel4))
+                .addGroup(titleBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel4)))
         );
 
         mainScreen.setBackground(new java.awt.Color(32, 32, 32));
         mainScreen.setLayout(new java.awt.CardLayout());
 
         titleScreen.setBackground(new java.awt.Color(32, 32, 32));
+        titleScreen.setName("titleScreen"); // NOI18N
 
         jLabel1.setFont(new java.awt.Font("Century Gothic", 1, 48)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
@@ -144,14 +157,12 @@ public class Main extends javax.swing.JFrame {
         titleScreenLayout.setHorizontalGroup(
             titleScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, titleScreenLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(titleScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(titleScreenLayout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(117, 117, 117))
-                    .addGroup(titleScreenLayout.createSequentialGroup()
-                        .addGap(21, 180, Short.MAX_VALUE)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(137, 137, 137))
         );
         titleScreenLayout.setVerticalGroup(
@@ -161,190 +172,94 @@ public class Main extends javax.swing.JFrame {
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(136, Short.MAX_VALUE))
+                .addContainerGap(181, Short.MAX_VALUE))
         );
 
         mainScreen.add(titleScreen, "titleScreen");
 
         routineScreen.setBackground(new java.awt.Color(32, 32, 32));
+        routineScreen.setName("routineScreen"); // NOI18N
 
-        routineContainers.setBackground(new java.awt.Color(32, 32, 32));
-
-        jPanel3.setBackground(new java.awt.Color(51, 51, 51));
-
-        monRoutineBtn.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
-        monRoutineBtn.setForeground(new java.awt.Color(255, 255, 255));
-        monRoutineBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyIcons/Play.png"))); // NOI18N
-        monRoutineBtn.setText("Monday Routine");
-        monRoutineBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        monRoutineBtn.setIconTextGap(8);
-        monRoutineBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+        jLabel14.setFont(new java.awt.Font("Century Gothic", 0, 11)); // NOI18N
+        jLabel14.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel14.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyIcons/plus.png"))); // NOI18N
+        jLabel14.setText("add routine");
+        jLabel14.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel14.setIconTextGap(8);
+        jLabel14.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                routineBtnClick(evt);
+                addRoutineClick(evt);
             }
         });
 
-        monInfoBtn.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
-        monInfoBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyIcons/InfoIcon.png"))); // NOI18N
-        monInfoBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        monInfoBtn.setIconTextGap(8);
-        monInfoBtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                routineInfoClicked(evt);
-            }
-        });
+        divider.setBackground(new java.awt.Color(153, 153, 153));
+        divider.setPreferredSize(new java.awt.Dimension(0, 1));
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addComponent(monInfoBtn)
-                .addGap(25, 25, 25)
-                .addComponent(monRoutineBtn)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        javax.swing.GroupLayout dividerLayout = new javax.swing.GroupLayout(divider);
+        divider.setLayout(dividerLayout);
+        dividerLayout.setHorizontalGroup(
+            dividerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addContainerGap(24, Short.MAX_VALUE)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(monInfoBtn)
-                    .addComponent(monRoutineBtn))
-                .addGap(20, 20, 20))
+        dividerLayout.setVerticalGroup(
+            dividerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1, Short.MAX_VALUE)
         );
 
-        jPanel4.setBackground(new java.awt.Color(51, 51, 51));
+        jScrollPane1.setBackground(new java.awt.Color(32, 32, 32));
+        jScrollPane1.setBorder(null);
 
-        tuesRoutineBtn.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
-        tuesRoutineBtn.setForeground(new java.awt.Color(255, 255, 255));
-        tuesRoutineBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyIcons/Play.png"))); // NOI18N
-        tuesRoutineBtn.setText("Tuesday Routine");
-        tuesRoutineBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        tuesRoutineBtn.setIconTextGap(8);
-        tuesRoutineBtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                routineBtnClick(evt);
-            }
-        });
+        routinePanelContainer.setBackground(new java.awt.Color(32, 32, 32));
 
-        tueInfoBtn.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
-        tueInfoBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyIcons/InfoIcon.png"))); // NOI18N
-        tueInfoBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        tueInfoBtn.setIconTextGap(8);
-        tueInfoBtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                routineInfoClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addComponent(tueInfoBtn)
-                .addGap(25, 25, 25)
-                .addComponent(tuesRoutineBtn)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        javax.swing.GroupLayout routinePanelContainerLayout = new javax.swing.GroupLayout(routinePanelContainer);
+        routinePanelContainer.setLayout(routinePanelContainerLayout);
+        routinePanelContainerLayout.setHorizontalGroup(
+            routinePanelContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 561, Short.MAX_VALUE)
         );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap(24, Short.MAX_VALUE)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tueInfoBtn)
-                    .addComponent(tuesRoutineBtn))
-                .addGap(20, 20, 20))
+        routinePanelContainerLayout.setVerticalGroup(
+            routinePanelContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 356, Short.MAX_VALUE)
         );
 
-        jPanel5.setBackground(new java.awt.Color(51, 51, 51));
-
-        wedRoutineBtn.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
-        wedRoutineBtn.setForeground(new java.awt.Color(255, 255, 255));
-        wedRoutineBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyIcons/Play.png"))); // NOI18N
-        wedRoutineBtn.setText("Wednesday Routine");
-        wedRoutineBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        wedRoutineBtn.setIconTextGap(8);
-        wedRoutineBtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                routineBtnClick(evt);
-            }
-        });
-
-        wedInfoBtn.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
-        wedInfoBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyIcons/InfoIcon.png"))); // NOI18N
-        wedInfoBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        wedInfoBtn.setIconTextGap(8);
-        wedInfoBtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                routineInfoClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addComponent(wedInfoBtn)
-                .addGap(25, 25, 25)
-                .addComponent(wedRoutineBtn)
-                .addContainerGap(348, Short.MAX_VALUE))
-        );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap(24, Short.MAX_VALUE)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(wedInfoBtn)
-                    .addComponent(wedRoutineBtn))
-                .addGap(20, 20, 20))
-        );
-
-        javax.swing.GroupLayout routineContainersLayout = new javax.swing.GroupLayout(routineContainers);
-        routineContainers.setLayout(routineContainersLayout);
-        routineContainersLayout.setHorizontalGroup(
-            routineContainersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        routineContainersLayout.setVerticalGroup(
-            routineContainersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(routineContainersLayout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(15, 15, 15))
-        );
+        jScrollPane1.setViewportView(routinePanelContainer);
 
         javax.swing.GroupLayout routineScreenLayout = new javax.swing.GroupLayout(routineScreen);
         routineScreen.setLayout(routineScreenLayout);
         routineScreenLayout.setHorizontalGroup(
             routineScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, routineScreenLayout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addComponent(routineContainers, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(25, 25, 25))
+            .addGroup(routineScreenLayout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addGroup(routineScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, routineScreenLayout.createSequentialGroup()
+                        .addComponent(divider, javax.swing.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
+                        .addGap(18, 18, 18))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, routineScreenLayout.createSequentialGroup()
+                        .addGap(25, 25, 25)
+                        .addGroup(routineScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, routineScreenLayout.createSequentialGroup()
+                                .addComponent(jLabel14)
+                                .addGap(25, 25, 25))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, routineScreenLayout.createSequentialGroup()
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 561, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(43, 43, 43))))))
         );
         routineScreenLayout.setVerticalGroup(
             routineScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, routineScreenLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(routineContainers, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel14)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(divider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 324, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
         mainScreen.add(routineScreen, "routineScreen");
 
         addRoutineScreen.setBackground(new java.awt.Color(32, 32, 32));
+        addRoutineScreen.setName("addRoutineScreen"); // NOI18N
 
         jLabel5.setFont(new java.awt.Font("Century Gothic", 1, 24)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
@@ -357,10 +272,6 @@ public class Main extends javax.swing.JFrame {
         jLabel7.setFont(new java.awt.Font("Century Gothic", 1, 24)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setText("Add Exercises");
-
-        jLabel9.setFont(new java.awt.Font("Century Gothic", 0, 11)); // NOI18N
-        jLabel9.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel9.setText("Reps");
 
         jLabel10.setFont(new java.awt.Font("Century Gothic", 0, 11)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(255, 255, 255));
@@ -383,11 +294,6 @@ public class Main extends javax.swing.JFrame {
         routineNameTxt.setForeground(new java.awt.Color(255, 255, 255));
         routineNameTxt.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
 
-        repsTxt.setBackground(new java.awt.Color(32, 32, 32));
-        repsTxt.setFont(new java.awt.Font("Century Gothic", 0, 11)); // NOI18N
-        repsTxt.setForeground(new java.awt.Color(255, 255, 255));
-        repsTxt.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
-
         setsTxt.setBackground(new java.awt.Color(32, 32, 32));
         setsTxt.setFont(new java.awt.Font("Century Gothic", 0, 11)); // NOI18N
         setsTxt.setForeground(new java.awt.Color(255, 255, 255));
@@ -409,8 +315,10 @@ public class Main extends javax.swing.JFrame {
         exerciseNameTxt.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
 
         addExerciseBtn.setFont(new java.awt.Font("Century Gothic", 0, 11)); // NOI18N
+        addExerciseBtn.setForeground(new java.awt.Color(255, 255, 255));
         addExerciseBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyIcons/plus.png"))); // NOI18N
         addExerciseBtn.setText("Add Exercise");
+        addExerciseBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         addExerciseBtn.setIconTextGap(8);
         addExerciseBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -419,8 +327,10 @@ public class Main extends javax.swing.JFrame {
         });
 
         addRoutineBtn.setFont(new java.awt.Font("Century Gothic", 0, 11)); // NOI18N
+        addRoutineBtn.setForeground(new java.awt.Color(255, 255, 255));
         addRoutineBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyIcons/plus.png"))); // NOI18N
         addRoutineBtn.setText("Add Routine");
+        addRoutineBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         addRoutineBtn.setIconTextGap(8);
         addRoutineBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -429,9 +339,11 @@ public class Main extends javax.swing.JFrame {
         });
 
         jLabel15.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
+        jLabel15.setForeground(new java.awt.Color(255, 255, 255));
         jLabel15.setText("Exercises:");
 
         exercisesCount.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
+        exercisesCount.setForeground(new java.awt.Color(255, 255, 255));
         exercisesCount.setText("0");
 
         javax.swing.GroupLayout addRoutineScreenLayout = new javax.swing.GroupLayout(addRoutineScreen);
@@ -439,17 +351,10 @@ public class Main extends javax.swing.JFrame {
         addRoutineScreenLayout.setHorizontalGroup(
             addRoutineScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(addRoutineScreenLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(addRoutineScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel7)
+                .addGap(18, 18, 18)
+                .addGroup(addRoutineScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(addRoutineScreenLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
                         .addGroup(addRoutineScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(addRoutineScreenLayout.createSequentialGroup()
-                                .addComponent(jLabel9)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(repsTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(addRoutineScreenLayout.createSequentialGroup()
                                 .addComponent(jLabel10)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -461,25 +366,31 @@ public class Main extends javax.swing.JFrame {
                             .addGroup(addRoutineScreenLayout.createSequentialGroup()
                                 .addComponent(jLabel12)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(executionTimeTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(addRoutineScreenLayout.createSequentialGroup()
-                                .addComponent(jLabel8)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(exerciseNameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(addRoutineScreenLayout.createSequentialGroup()
-                                .addComponent(jLabel6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(addRoutineScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(addRoutineScreenLayout.createSequentialGroup()
-                                        .addComponent(jLabel15)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(exercisesCount))
-                                    .addComponent(routineNameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(executionTimeTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(40, 40, 40)
-                        .addGroup(addRoutineScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(addExerciseBtn)
+                        .addComponent(addExerciseBtn))
+                    .addGroup(addRoutineScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel5)
+                        .addComponent(jLabel7)
+                        .addGroup(addRoutineScreenLayout.createSequentialGroup()
+                            .addGap(53, 53, 53)
+                            .addGroup(addRoutineScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(addRoutineScreenLayout.createSequentialGroup()
+                                    .addComponent(jLabel8)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(exerciseNameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(addRoutineScreenLayout.createSequentialGroup()
+                                    .addComponent(jLabel6)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(addRoutineScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(addRoutineScreenLayout.createSequentialGroup()
+                                            .addComponent(jLabel15)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(exercisesCount))
+                                        .addComponent(routineNameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGap(40, 40, 40)
                             .addComponent(addRoutineBtn))))
-                .addContainerGap(157, Short.MAX_VALUE))
+                .addContainerGap(161, Short.MAX_VALUE))
         );
         addRoutineScreenLayout.setVerticalGroup(
             addRoutineScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -503,10 +414,6 @@ public class Main extends javax.swing.JFrame {
                     .addComponent(exerciseNameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(addRoutineScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(repsTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9))
-                .addGap(18, 18, 18)
-                .addGroup(addRoutineScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(setsTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel10))
                 .addGap(18, 18, 18)
@@ -518,80 +425,39 @@ public class Main extends javax.swing.JFrame {
                     .addComponent(executionTimeTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel12)
                     .addComponent(addExerciseBtn))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(96, Short.MAX_VALUE))
         );
 
         mainScreen.add(addRoutineScreen, "addRoutineScreen");
 
         activityScreen.setBackground(new java.awt.Color(32, 32, 32));
-
-        jLabel3.setFont(new java.awt.Font("Century Gothic", 0, 24)); // NOI18N
-        jLabel3.setText("00:00");
-
-        jLabel13.setFont(new java.awt.Font("Century Gothic", 0, 24)); // NOI18N
-        jLabel13.setText("Execution Time");
-
-        jLabel17.setFont(new java.awt.Font("Century Gothic", 0, 24)); // NOI18N
-        jLabel17.setText("Sets");
-
-        jLabel18.setFont(new java.awt.Font("Century Gothic", 0, 24)); // NOI18N
-        jLabel18.setText("0/0");
-
-        exerciseNameLabel.setFont(new java.awt.Font("Century Gothic", 0, 24)); // NOI18N
-        exerciseNameLabel.setText("Exercise Name");
+        activityScreen.setName("activityScreen"); // NOI18N
 
         javax.swing.GroupLayout activityScreenLayout = new javax.swing.GroupLayout(activityScreen);
         activityScreen.setLayout(activityScreenLayout);
         activityScreenLayout.setHorizontalGroup(
             activityScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(activityScreenLayout.createSequentialGroup()
-                .addContainerGap(232, Short.MAX_VALUE)
-                .addGroup(activityScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, activityScreenLayout.createSequentialGroup()
-                        .addGroup(activityScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(exerciseNameLabel)
-                            .addComponent(jLabel13))
-                        .addGap(225, 225, 225))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, activityScreenLayout.createSequentialGroup()
-                        .addComponent(jLabel17)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel18)
-                        .addGap(266, 266, 266))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, activityScreenLayout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addGap(287, 287, 287))))
+            .addGap(0, 647, Short.MAX_VALUE)
         );
         activityScreenLayout.setVerticalGroup(
             activityScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(activityScreenLayout.createSequentialGroup()
-                .addGap(35, 35, 35)
-                .addComponent(exerciseNameLabel)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel3)
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jLabel13)
-                .addGap(67, 67, 67)
-                .addGroup(activityScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel17)
-                    .addComponent(jLabel18))
-                .addGap(99, 99, 99))
+            .addGap(0, 391, Short.MAX_VALUE)
         );
 
-        mainScreen.add(activityScreen, "card5");
+        mainScreen.add(activityScreen, "activityScreen");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(titleBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addComponent(mainScreen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(mainScreen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(titleBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
                 .addComponent(mainScreen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -600,7 +466,9 @@ public class Main extends javax.swing.JFrame {
 
         jMenu1.setBackground(new java.awt.Color(32, 32, 32));
         jMenu1.setText("Window");
+        jMenu1.setFont(new java.awt.Font("Century Gothic", 0, 11)); // NOI18N
 
+        homeMenu.setFont(new java.awt.Font("Century Gothic", 0, 11)); // NOI18N
         homeMenu.setText("Home");
         homeMenu.setToolTipText("");
         homeMenu.addActionListener(new java.awt.event.ActionListener() {
@@ -610,6 +478,7 @@ public class Main extends javax.swing.JFrame {
         });
         jMenu1.add(homeMenu);
 
+        routineMenu.setFont(new java.awt.Font("Century Gothic", 0, 11)); // NOI18N
         routineMenu.setText("Routine");
         routineMenu.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -619,10 +488,6 @@ public class Main extends javax.swing.JFrame {
         jMenu1.add(routineMenu);
 
         menuBar.add(jMenu1);
-
-        jMenu2.setBackground(new java.awt.Color(32, 32, 32));
-        jMenu2.setText("About");
-        menuBar.add(jMenu2);
 
         setJMenuBar(menuBar);
 
@@ -640,6 +505,11 @@ public class Main extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void styleComponents() {
+        // Remove routine scroll pane horizontal scroll
+        jScrollPane1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    }
+    
     private void populateRoutineList() {
         try {
             // Get routines data
@@ -693,53 +563,130 @@ public class Main extends javax.swing.JFrame {
     private void menuButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuButtonActionPerformed
         Object src = evt.getSource();
         if (src == homeMenu) {
-            cardLayout.show(mainScreen, "titleScreen");
-            updateFiles();
+            switchScreens("titleScreen");
         } else if (src == routineMenu) {
-            cardLayout.show(mainScreen, "routineScreen");
+            switchScreens("routineScreen");
+            
+            updateRoutineScreen();
         }
     }//GEN-LAST:event_menuButtonActionPerformed
 
+    private void updateRoutineScreen() {
+        int yPos = 0;
+            int margin = 10;
+            for (Routine r : routineList) {
+                RoutinePanelObject routinePanel = new RoutinePanelObject(cardLayout, mainScreen, r);
+                int pnlHeight = routinePanel.getPreferredSize().height;
+                int pnlWidth = routinePanel.getPreferredSize().width;
+            
+                routinePanelContainer.add(routinePanel);
+                
+                routinePanel.setBounds(0, yPos, pnlWidth, pnlHeight);
+                yPos += pnlHeight + margin;
+            }
+            
+            routinePanelContainer.setPreferredSize(new Dimension(routinePanelContainer.getPreferredSize().width, yPos));
+    }
+    
     private void addObjectButton(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addObjectButton
         Object src = evt.getSource();
-        if (src == addRoutineBtn) {
+        
+        if (src == addExerciseBtn) {
+            if (!verifyInputFields(false)) {
+                JOptionPane.showMessageDialog(null, "Please make sure to fill up all the fields.");
+                return;
+            }
+            
+            // Add Exercise Button
             String name = exerciseNameTxt.getText();
-            String reps = repsTxt.getText();
-            String sets = setsTxt.getText();
-            String breakInterval = breakIntervalTxt.getText();
-            String execTime = executionTimeTxt.getText();
-        } else if (src == addExerciseBtn) {
+            int sets = Integer.parseInt(setsTxt.getText());
+            float breakInterval = Float.parseFloat(breakIntervalTxt.getText());
+            float execTime = Float.parseFloat(executionTimeTxt.getText());
+            
+            tempExer = new Exercise(name, execTime, breakInterval, sets);
+            
+            tempRoutine.getExercises().add(tempExer);
+            
+            for (Exercise e : tempRoutine.getExercises()) {
+                System.out.println(e);
+            }
+            
+            exerciseNameTxt.setText("");
+            setsTxt.setText("");
+            breakIntervalTxt.setText("");
+            executionTimeTxt.setText("");
+            
+            JOptionPane.showMessageDialog(null, "Success!");
+            exercisesCount.setText(Integer.toString(tempRoutine.getExercises().size()));
+        } else if (src == addRoutineBtn) {
+            if (!verifyInputFields(true)) {
+                JOptionPane.showMessageDialog(null, "Please make sure to fill up all the fields and have at least one Exercise.");
+                return;
+            }
+            
+            // Add Routine Button
             String routineName = routineNameTxt.getText();
+            tempRoutine.setName(routineName);
+            
+            routineNameTxt.setText("");
+            routineList.add(tempRoutine);
+            
+            updateFiles();
+            JOptionPane.showMessageDialog(null, "Success!");
         }
     }//GEN-LAST:event_addObjectButton
 
-    private void routineBtnClick(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_routineBtnClick
-        // TODO add your handling code here:
-    }//GEN-LAST:event_routineBtnClick
+    private void addRoutineClick(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addRoutineClick
+        switchScreens("addRoutineScreen");
+        tempRoutine = new Routine(Integer.toString(routineList.size()));
+    }//GEN-LAST:event_addRoutineClick
 
-    private void routineInfoClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_routineInfoClicked
-        Object src = evt.getSource();
-        String exerDeets = "";
-        if (src == monInfoBtn) {
-            exerDeets = """
-                        Routine Name: Monday Routine
-                        Exercises: Jogging, Push-ups, Sit-ups
-                        """;
-        } else if (src == tueInfoBtn) {
-            exerDeets = """
-                        Routine Name: Tuesday Routine
-                        Exercises: Jogging, Push-ups, Sit-ups
-                        """;
-        } else if (src == wedInfoBtn) {
-            exerDeets = """
-                        Routine Name: Wednesday Routine
-                        Exercises: Jogging, Push-ups, Sit-ups
-                        """;
+    private void backButtonClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_backButtonClicked
+        backButton();
+    }//GEN-LAST:event_backButtonClicked
+
+    public void backButton() {
+        if (history.size() < 2) return;
+        
+        if (history.get(history.size() - 1) == "activityScreen")
+            activityScreen.removeAll();
+        
+        history.pop();
+        
+        if (history.get(history.size() - 1) == "routineScreen")
+            updateRoutineScreen();
+        
+        cardLayout.show(mainScreen, history.get(history.size() - 1)) ;
+    }
+    
+    public void switchScreens(String newScreen) {
+        if (history.get(history.size() - 1) != newScreen)
+            history.add(newScreen);
+        
+        for (String str : history) {
+            System.out.println(str);
+        }
+        cardLayout.show(mainScreen, newScreen);
+    }
+    
+    public boolean verifyInputFields(boolean isRoutine) {
+        // Check routine
+        if (isRoutine) {
+            if (routineNameTxt.getText().isEmpty()) return false;
+            
+            System.out.println(tempRoutine.getExercises().size());
+            // Check if there are exercises
+            if (tempRoutine.getExercises().size() < 1) return false;
+        } else {
+            if (exerciseNameTxt.getText().isEmpty()) return false;
+            else if (setsTxt.getText().isEmpty()) return false;
+            else if (breakIntervalTxt.getText().isEmpty()) return false;
+            else if (executionTimeTxt.getText().isEmpty()) return false;
         }
         
-        JOptionPane.showMessageDialog(null, exerDeets);
-    }//GEN-LAST:event_routineInfoClicked
-
+        return true;
+    }
+    
     public static void main(String args[]) {
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -847,14 +794,25 @@ public class Main extends javax.swing.JFrame {
         }
     }
     
+    public JPanel getActivityScreen() {
+        return activityScreen;
+    }
+    
+    public static String format(double d) {
+        if(d == (long) d)
+            return String.format("%d",(long)d);
+        else
+            return String.format("%s",d);
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel activityScreen;
     private javax.swing.JLabel addExerciseBtn;
     private javax.swing.JLabel addRoutineBtn;
     private javax.swing.JPanel addRoutineScreen;
     private javax.swing.JTextField breakIntervalTxt;
+    private javax.swing.JPanel divider;
     private javax.swing.JTextField executionTimeTxt;
-    private javax.swing.JLabel exerciseNameLabel;
     private javax.swing.JTextField exerciseNameTxt;
     private javax.swing.JLabel exercisesCount;
     private javax.swing.JMenuItem homeMenu;
@@ -862,10 +820,8 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -873,28 +829,17 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPanel mainScreen;
     private javax.swing.JMenuBar menuBar;
-    private javax.swing.JLabel monInfoBtn;
-    private javax.swing.JLabel monRoutineBtn;
-    private javax.swing.JTextField repsTxt;
-    private javax.swing.JPanel routineContainers;
     private javax.swing.JMenuItem routineMenu;
     private javax.swing.JTextField routineNameTxt;
+    private javax.swing.JPanel routinePanelContainer;
     private javax.swing.JPanel routineScreen;
     private javax.swing.JTextField setsTxt;
     private javax.swing.JPanel titleBar;
     private javax.swing.JPanel titleScreen;
-    private javax.swing.JLabel tueInfoBtn;
-    private javax.swing.JLabel tuesRoutineBtn;
-    private javax.swing.JLabel wedInfoBtn;
-    private javax.swing.JLabel wedRoutineBtn;
     // End of variables declaration//GEN-END:variables
 }

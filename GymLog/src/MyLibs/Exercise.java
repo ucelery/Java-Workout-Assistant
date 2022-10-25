@@ -11,6 +11,15 @@ public class Exercise {
     private float breakTime;
     
     // Constructors
+    public Exercise (Exercise exer) {
+        this.name = exer.name;
+        this.time = exer.time;
+        this.sets = exer.sets;
+        this.breakTime = exer.breakTime;
+        
+        this.type = Type.Time;
+    }
+    
     public Exercise (String name, float time, float breakTime, int sets) {
         this.name = name;
         this.time = time;
@@ -73,5 +82,9 @@ public class Exercise {
     
     public void setType(Type type) {
         this.type = type;
+    }
+    
+    public void setBreakTime(float breakTime) {
+        this.breakTime = breakTime;
     }
 }

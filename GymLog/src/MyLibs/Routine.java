@@ -10,6 +10,10 @@ public class Routine {
     private String id;
     private ArrayList<Exercise> exercises = new ArrayList();
     
+    public Routine(String id) {
+        this.id = id;
+    }
+    
     public Routine(String id, String name) {
         this.name = name;
         this.id = id;
