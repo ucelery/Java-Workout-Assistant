@@ -107,9 +107,19 @@ public class RoutinePanelObject extends javax.swing.JPanel {
     }//GEN-LAST:event_routineObjectButtonClicked
 
     private void deleteRoutine(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteRoutine
+        int choice = JOptionPane.showConfirmDialog(mainScreen, "Are you sure you want to delete " + routine.getName() + "?", "Warning", JOptionPane.WARNING_MESSAGE);
+        if (choice == JOptionPane.YES_OPTION) {
+            
+            getMain().removeRoutine(routine, this);
+        }
+            
         
     }//GEN-LAST:event_deleteRoutine
 
+    private Main getMain() {
+        return (Main)SwingUtilities.getAncestorOfClass(Main.class, this);
+    }
+    
     private String getRoutineDeets() {
         String returnStr = "Routine: " + routine.getName() + "\n";
         for (Exercise e : routine.getExercises()) {
