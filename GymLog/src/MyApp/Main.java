@@ -24,11 +24,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
+import javax.swing.text.PlainDocument;
 
 public class Main extends javax.swing.JFrame {
     public static JFrame frame = null;
@@ -48,7 +55,7 @@ public class Main extends javax.swing.JFrame {
         menuBar.setVisible(false);
         initializeHotkeys();
         populateRoutineList();
-        styleComponents();
+        customInit();
         
         history.add("titleScreen");
     }
@@ -300,16 +307,19 @@ public class Main extends javax.swing.JFrame {
         setsTxt.setBackground(new java.awt.Color(32, 32, 32));
         setsTxt.setFont(new java.awt.Font("Century Gothic", 0, 11)); // NOI18N
         setsTxt.setForeground(new java.awt.Color(255, 255, 255));
+        setsTxt.setText("0");
         setsTxt.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
 
         breakIntervalTxt.setBackground(new java.awt.Color(32, 32, 32));
         breakIntervalTxt.setFont(new java.awt.Font("Century Gothic", 0, 11)); // NOI18N
         breakIntervalTxt.setForeground(new java.awt.Color(255, 255, 255));
+        breakIntervalTxt.setText("0");
         breakIntervalTxt.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
 
         executionTimeTxt.setBackground(new java.awt.Color(32, 32, 32));
         executionTimeTxt.setFont(new java.awt.Font("Century Gothic", 0, 11)); // NOI18N
         executionTimeTxt.setForeground(new java.awt.Color(255, 255, 255));
+        executionTimeTxt.setText("0");
         executionTimeTxt.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
 
         exerciseNameTxt.setBackground(new java.awt.Color(32, 32, 32));
@@ -508,9 +518,49 @@ public class Main extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void styleComponents() {
+    private void customInit() {
         // Remove routine scroll pane horizontal scroll
         jScrollPane1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        
+        // disable text/symbol input
+        ((AbstractDocument) setsTxt.getDocument()).setDocumentFilter(new DocumentFilter() {
+            Pattern regEx = Pattern.compile("\\d+");
+
+            @Override
+            public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                Matcher matcher = regEx.matcher(text);
+                if (!matcher.matches()) {
+                    return;
+                }
+                super.replace(fb, offset, length, text, attrs);
+            }
+        });
+        
+        ((AbstractDocument) breakIntervalTxt.getDocument()).setDocumentFilter(new DocumentFilter() {
+            Pattern regEx = Pattern.compile("\\d+");
+
+            @Override
+            public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                Matcher matcher = regEx.matcher(text);
+                if (!matcher.matches()) {
+                    return;
+                }
+                super.replace(fb, offset, length, text, attrs);
+            }
+        });
+        
+        ((AbstractDocument) executionTimeTxt.getDocument()).setDocumentFilter(new DocumentFilter() {
+            Pattern regEx = Pattern.compile("\\d+");
+
+            @Override
+            public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                Matcher matcher = regEx.matcher(text);
+                if (!matcher.matches()) {
+                    return;
+                }
+                super.replace(fb, offset, length, text, attrs);
+            }
+        });
     }
     
     private void populateRoutineList() {
@@ -619,9 +669,9 @@ public class Main extends javax.swing.JFrame {
             tempRoutine.getExercises().add(tempExer);
             
             exerciseNameTxt.setText("");
-            setsTxt.setText("");
-            breakIntervalTxt.setText("");
-            executionTimeTxt.setText("");
+            setsTxt.setText("0");
+            breakIntervalTxt.setText("0");
+            executionTimeTxt.setText("0");
             
             JOptionPane.showMessageDialog(null, "Success!");
             exercisesCount.setText(Integer.toString(tempRoutine.getExercises().size()));
@@ -683,9 +733,9 @@ public class Main extends javax.swing.JFrame {
             if (tempRoutine.getExercises().size() < 1) return false;
         } else {
             if (exerciseNameTxt.getText().isEmpty()) return false;
-            else if (setsTxt.getText().isEmpty()) return false;
-            else if (breakIntervalTxt.getText().isEmpty()) return false;
-            else if (executionTimeTxt.getText().isEmpty()) return false;
+            else if (setsTxt.getText().isEmpty() || setsTxt.getText().equals("0")) return false;
+            else if (breakIntervalTxt.getText().isEmpty() || breakIntervalTxt.getText().equals("0")) return false;
+            else if (executionTimeTxt.getText().isEmpty() || executionTimeTxt.getText().equals("0")) return false;
         }
         
         return true;
