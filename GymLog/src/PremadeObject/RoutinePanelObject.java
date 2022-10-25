@@ -28,6 +28,7 @@ public class RoutinePanelObject extends javax.swing.JPanel {
 
         routinePlayButton = new javax.swing.JLabel();
         routineNameLabel = new javax.swing.JLabel();
+        routinePlayButton1 = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(51, 51, 51));
 
@@ -46,16 +47,28 @@ public class RoutinePanelObject extends javax.swing.JPanel {
         routineNameLabel.setText("Routine Name");
         routineNameLabel.setIconTextGap(18);
 
+        routinePlayButton1.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
+        routinePlayButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyIcons/delete.png"))); // NOI18N
+        routinePlayButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        routinePlayButton1.setIconTextGap(18);
+        routinePlayButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                deleteRoutine(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(35, 35, 35)
+                .addGap(25, 25, 25)
+                .addComponent(routinePlayButton1)
+                .addGap(29, 29, 29)
                 .addComponent(routinePlayButton)
                 .addGap(18, 18, 18)
                 .addComponent(routineNameLabel)
-                .addContainerGap(334, Short.MAX_VALUE))
+                .addContainerGap(783, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -67,6 +80,10 @@ public class RoutinePanelObject extends javax.swing.JPanel {
                         .addComponent(routineNameLabel)
                         .addGap(12, 12, 12)))
                 .addContainerGap(23, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(routinePlayButton1)
+                .addGap(35, 35, 35))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -89,6 +106,10 @@ public class RoutinePanelObject extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_routineObjectButtonClicked
 
+    private void deleteRoutine(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteRoutine
+        
+    }//GEN-LAST:event_deleteRoutine
+
     private String getRoutineDeets() {
         String returnStr = "Routine: " + routine.getName() + "\n";
         for (Exercise e : routine.getExercises()) {
@@ -104,5 +125,6 @@ public class RoutinePanelObject extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel routineNameLabel;
     private javax.swing.JLabel routinePlayButton;
+    private javax.swing.JLabel routinePlayButton1;
     // End of variables declaration//GEN-END:variables
 }

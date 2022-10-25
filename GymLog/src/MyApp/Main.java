@@ -607,10 +607,6 @@ public class Main extends javax.swing.JFrame {
             
             tempRoutine.getExercises().add(tempExer);
             
-            for (Exercise e : tempRoutine.getExercises()) {
-                System.out.println(e);
-            }
-            
             exerciseNameTxt.setText("");
             setsTxt.setText("");
             breakIntervalTxt.setText("");
@@ -663,9 +659,6 @@ public class Main extends javax.swing.JFrame {
         if (history.get(history.size() - 1) != newScreen)
             history.add(newScreen);
         
-        for (String str : history) {
-            System.out.println(str);
-        }
         cardLayout.show(mainScreen, newScreen);
     }
     
@@ -674,7 +667,6 @@ public class Main extends javax.swing.JFrame {
         if (isRoutine) {
             if (routineNameTxt.getText().isEmpty()) return false;
             
-            System.out.println(tempRoutine.getExercises().size());
             // Check if there are exercises
             if (tempRoutine.getExercises().size() < 1) return false;
         } else {

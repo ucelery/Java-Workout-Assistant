@@ -75,6 +75,10 @@ public class ActivityPanelScreen extends javax.swing.JPanel {
     
     private void changeScreens(String screen) {
         Main mainFrame = getMain();
+        
+        // if mainFrame got deleted
+        if (mainFrame == null) return;
+        
         mainFrame.switchScreens(screen);
         timer.stop();
     }
